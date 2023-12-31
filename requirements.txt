@@ -1,0 +1,33 @@
+atomicwrites==1.4.0
+certifi @ file:///croot/certifi_1700501669400/work/certifi
+cffi @ file:///home/conda/feedstock_root/build_artifacts/cffi_1696001742886/work
+contourpy @ file:///home/conda/feedstock_root/build_artifacts/contourpy_1699041882027/work
+cycler @ file:///home/conda/feedstock_root/build_artifacts/cycler_1696677705766/work
+fonttools @ file:///home/conda/feedstock_root/build_artifacts/fonttools_1700736798926/work
+ifcopenshell==0.7.0.231218
+importlib-resources @ file:///home/conda/feedstock_root/build_artifacts/importlib_resources_1699364556997/work
+Js2Py @ file:///croot/js2py_1679573641613/work
+kiwisolver @ file:///home/conda/feedstock_root/build_artifacts/kiwisolver_1695379916629/work
+lark @ file:///opt/conda/conda-bld/lark_1663951716568/work
+matplotlib @ file:///tmp/build/80754af9/matplotlib-base_1607974568509/work
+mpmath @ file:///croot/mpmath_1690848262763/work
+munkres==1.1.4
+numpy @ file:///croot/numpy_and_numpy_base_1687466208449/work
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1696202382185/work
+Pillow @ file:///home/conda/feedstock_root/build_artifacts/pillow_1695247205741/work
+powerlaw @ file:///croot/powerlaw_1689093785595/work
+psycopg2-binary==2.9.9
+pycairo==1.25.1
+pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1636257122734/work
+PyGObject==3.46.0
+pyjsparser @ file:///opt/conda/conda-bld/pyjsparser_1663891625447/work
+pyparsing @ file:///home/conda/feedstock_root/build_artifacts/pyparsing_1690737849915/work
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1626286286081/work
+regex @ file:///croot/regex_1696515298636/work
+scipy @ file:///croot/scipy_1701295040508/work/dist/scipy-1.11.4-cp39-cp39-linux_x86_64.whl#sha256=7d3c50abd59d682a73a495b68c974347054667b7f0eee3dcdf2605778b9e5c6f
+six @ file:///tmp/build/80754af9/six_1644875935023/work
+tornado @ file:///croot/tornado_1696936946304/work
+tzlocal @ file:///home/conda/feedstock_root/build_artifacts/tzlocal_1696475191999/work
+unicodedata2 @ file:///home/conda/feedstock_root/build_artifacts/unicodedata2_1695847984941/work
+zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1695255097490/work
+zstandard==0.22.0
