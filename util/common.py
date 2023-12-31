@@ -32,3 +32,5 @@ def square_unit_transform(value, unit):
     else:
         raise ValueError("Unsupported unit: ", unit)
 
+def float_equal(a, b, epsilon=1e-6):
+    return abs(a - b) < epsilon
