@@ -4,9 +4,6 @@ import configparser
 from task3_cost_estmation.rawfile_task3_impl import RawfileTask3Impl
 from task3_cost_estmation.postgresql_task3_impl import PGTask3Impl
 
-# 指定测试的实现类
-test_class = "POSTGRESQL"
-
 # 读取配置文件
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -28,6 +25,7 @@ class TaskFactory:
 if "__main__" == __name__:
     task_facotry = TaskFactory()
     pwd = os.getcwd()
+    test_class = config.get('COMMON', 'test')
     
     # Task3
     task3_workloads = ["datasets/task3/workload1.ifc"]
