@@ -157,17 +157,31 @@ class PGTask3Impl:
         
         # 1. 通过一楼所有的地板面积之和计算场地总面积
         # 从pg_task3_workload1.sql读取SQL语句
-        query1 = open("task3_cost_estimation/pg_task3_workload1.sql", "r").read()
+        query1 = open("task3_cost_estimation/pg_task3_workload1_job1.sql", "r").read()
         cur.execute(query1)
         total_site_area = util.square_unit_transform(cur.fetchone()[0], "ft^2")
         cost_result.set_site_area(total_site_area)
         
         # 2. 计算地板面积之和
-        query2 = open("task3_cost_estimation/pg_task3_workload2.sql", "r").read()
+        query2 = open("task3_cost_estimation/pg_task3_workload1_job2.sql", "r").read()
         cur.execute(query2)
         total_slab_area = util.square_unit_transform(cur.fetchone()[0], "ft^2")
         cost_result.set_slab_area(total_slab_area)
         
+        # 3. 计算内/外墙总面积
+        query3_all = open("task3_cost_estimation/pg_task3_workload1_job3.sql", "r").read().split("-- ##")
+        cur.execute(query3_all[0])  # 创建获取Pset_value的函数
+        
+        cur.execute(query3_all[1])
+        tuple = cur.fetchone()
+        cost_result.set_interior_wall_area(tuple[0], "ft^2")
+        print(f"total_interior_wall_area: {tuple[0]}")
+        
+        cur.execute(query3_all[2])
+        tuple = cur.fetchone()
+        cost_result.set_exterior_wall_area(tuple[0], "ft^2")
+        print(f"total_exterior_wall_area: {tuple[0]}")
+
         return cost_result
     
     def cleanup(self):
