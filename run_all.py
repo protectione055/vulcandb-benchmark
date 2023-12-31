@@ -31,17 +31,27 @@ if "__main__" == __name__:
     task3_workloads = ["datasets/task3/workload1.ifc"]
     for i in range(len(task3_workloads)):
         task3_workloads[i] = os.path.join(pwd, task3_workloads[i])
-    task3 = task_facotry.get_task3(test_class)
-    # task3.prepare_data(task3_workloads)
-    ground_true = task_facotry.get_task3("RAWFILE")
-    ground_true.prepare_data(task3_workloads)
+    task3_test = task_facotry.get_task3(test_class)
+    print("Task3 test class: " + test_class + " preparing data...")
+    task3_test.prepare_data(task3_workloads)
+    print("Task3 ground true preparing data...")
+    task3_ground_true = task_facotry.get_task3("RAWFILE")
+    task3_ground_true.prepare_data(task3_workloads)
     
     # Task3 Job1
-    result_job1 = task3.run_job1()
-    ground_true_job1 = ground_true.run_job1()
-    print(f"Task3 Job1: {result_job1}")
-    print(f"Ground true Job1: {ground_true_job1}")
+    print("Task3 test class: " + test_class + " running...")
+    task3_result = task3_test.run()
+    print("Task3 ground true running...")
+    task3_expected = task3_ground_true.run()
+    if task3_result == task3_expected:
+        print("Task3 all query passed.")
+    else:
+        print("Task3 query failed.")
+        print("Expected:")
+        print(task3_expected)
+        print("Actual:")
+        print(task3_result)
     
     # Task3 Cleanup
-    task3.cleanup()
-    ground_true.cleanup()
+    task3_test.cleanup()
+    task3_ground_true.cleanup()

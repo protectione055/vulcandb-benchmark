@@ -5,7 +5,7 @@ import ifcopenshell
 import ifcopenshell.util.selector as selector
 import ifcopenshell.util.element
         
-def estimate_cost_job1(ifc_file, name="20210219Architecture.ifc"):
+def estimate_cost_workload1(ifc_file, name="20210219Architecture.ifc"):
     '''
     为模型20210219Architecture.ifc专门写的造价计算模型, 因为这个模型的楼板是通过IfcCovering表达的, 而不是通过IfcSlab.
     
@@ -80,8 +80,8 @@ class RawfileTask3Impl:
             self.ifc_files.append(ifc_file)
         pass
     @Timer.eclapse
-    def run_job1(self):
-        return estimate_cost_job1(self.ifc_files[0])
+    def run(self):
+        return estimate_cost_workload1(self.ifc_files[0])
     
     def cleanup(self):
         pass

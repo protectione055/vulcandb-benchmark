@@ -1,4 +1,4 @@
-from util.common import square_unit_transform
+from util.common import square_unit_transform, float_equal
 
 class CostEstimator:
     '''
@@ -66,6 +66,19 @@ class CostEstimator:
             "total_fire_fighting_system_cost": 0, # 消防系统总造价
             "total_weak_current_system_cost": 0, # 弱电系统总造价
         }
+    
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, CostEstimator):
+            return False
+        
+        for key in self._cost_items.keys():
+            if not float_equal(self._cost_items[key], __value._cost_items[key]):
+                return False
+        
+        for key in self._metrics.keys():
+            if not float_equal(self._metrics[key], __value._metrics[key]):
+                return False
+        return True
         
     def get_metric(self, metric_name):
         return self._metrics[metric_name]
@@ -119,10 +132,10 @@ class CostEstimator:
         return self._cost_items
     
     def __str__(self):
-        res  = ""
+        res  = "{"
         project_total_cost = 0
         for items in self._cost_items.items():
-            res += str(items)
+            res += f'''({items[0]}: {items[1]}), \n'''
             project_total_cost += items[1]
-        res += f"Project total cost: {project_total_cost}"
+        res += f"(Project total cost: {project_total_cost})}}"
         return res
