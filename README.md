@@ -29,6 +29,6 @@
 
 ## 2. 环境配置
 
-```
+```bash
 pip install -r requirements.txt
 ```
