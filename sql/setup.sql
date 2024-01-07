@@ -1,3 +1,5 @@
+CREATE SEQUENCE ifc_instance_id_seq START 1;
+
 -- Function: 从数据库中获取实体在属性集中的值
 -- Input: entity_name, pset_name, property_name, condition
 -- Output: eid, value_result
@@ -50,6 +52,5 @@ BEGIN
     INSERT INTO ifcproject (id, globalid, ownerhistory, name, description, creationdate, unitsincontext, longname, phase, representationcontext, units, compositiontype)
     VALUES format('%s, %s, NULL, %s, %s, NULL, NULL, NULL, NULL, NULL', eid, uuid, project_name, project_desc);
     END;
-
 END;
 $$ LANGUAGE plpgsql;

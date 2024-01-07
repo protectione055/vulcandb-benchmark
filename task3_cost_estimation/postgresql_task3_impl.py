@@ -60,7 +60,7 @@ class PGTask3Impl:
             attr_value = attr_info[entity.attribute_name(i)]
             
             if entity.is_a("ifcpropertysinglevalue") and attr_name == "NominalValue":
-                insert_sql += f"'{str(attr_value.get_info()['wrappedValue']).replace("'", "''")}',"
+                insert_sql += f"""'{str(attr_value.get_info()['wrappedValue']).replace("'", "''")}',"""
                 continue
                     
             if attr_type == "DERIVED":
@@ -130,7 +130,7 @@ class PGTask3Impl:
                         command = self._get_create_table_sql(entity)
                         cursor.execute(command)
                         conn.commit()
-                        # print(command)
+                        print(command)
                     try:
                         # 插入属性记录
                         command = self._get_insert_sql(entity)
