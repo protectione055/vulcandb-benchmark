@@ -68,5 +68,5 @@ if "__main__" == __name__:
             print(task3_result)
         
         # Task3 Cleanup
-        task3_test.cleanup()
+        # task3_test.cleanup()
         task3_ground_true.cleanup()
