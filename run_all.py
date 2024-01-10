@@ -4,6 +4,7 @@ import configparser
 from task3_cost_estimation.rawfile_task3_impl import RawfileTask3Impl
 from task3_cost_estimation.postgresql_task3_impl import PGTask3Impl
 from task1_geom_edit.rawfile_task1_impl import RawfileTask1Impl
+from task3_cost_estimation.neo4j_task3_impl import Neo4jTask3Impl
 
 # 读取配置文件
 config = configparser.ConfigParser()
@@ -26,6 +27,13 @@ class TaskFactory:
             port = config.get('POSTGRESQL', 'port')
             args = {"user": user, "password": password, "host": host, "port": port}
             return PGTask3Impl(args)
+        elif test_class == "NEO4J":
+            user = config.get('NEO4J', 'user')
+            password = config.get('NEO4J', 'password')
+            host = config.get('NEO4J', 'host')
+            port = config.get('NEO4J', 'port')
+            args = {"user": user, "password": password, "host": host, "port": port}
+            return Neo4jTask3Impl(args)
         else:
             raise Exception("No such test class: " + test_class)
 
@@ -44,6 +52,7 @@ if "__main__" == __name__:
     if config.get('COMMON', 'run_task3') == "True":
         # Task3 Startup
         task3_workloads = ["datasets/task3/workload1.ifc"]
+        # task3_workloads = ["datasets/sample.ifc"]
         for i in range(len(task3_workloads)):
             task3_workloads[i] = os.path.join(pwd, task3_workloads[i])
         task3_test = task_facotry.get_task3(test_class)
@@ -68,5 +77,5 @@ if "__main__" == __name__:
             print(task3_result)
         
         # Task3 Cleanup
-        task3_test.cleanup()
+        # task3_test.cleanup()
         task3_ground_true.cleanup()
