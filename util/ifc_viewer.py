@@ -53,7 +53,10 @@ if __name__ == '__main__':
             command = input("\033[32mifc@viewer->\033[0m ")
             match = pattern.match(command)
             if match is None:
-                print("Invalid command.")
+                if command == '\n':
+                    pass
+                else:
+                    print("Invalid command.")
                 continue
             opt = match.group(1)
             arg = match.group(3)
