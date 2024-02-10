@@ -130,7 +130,7 @@ class PGTask3Impl:
                         command = self._get_create_table_sql(entity)
                         cursor.execute(command)
                         conn.commit()
-                        # print(command)
+                        print(command)
                     try:
                         # 插入属性记录
                         command = self._get_insert_sql(entity)
