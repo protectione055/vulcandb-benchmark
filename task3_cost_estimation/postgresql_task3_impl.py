@@ -60,7 +60,7 @@ class PGTask3Impl:
             attr_value = attr_info[entity.attribute_name(i)]
             
             if entity.is_a("ifcpropertysinglevalue") and attr_name == "NominalValue":
-                insert_sql += f"'{str(attr_value.get_info()['wrappedValue']).replace("'", "''")}',"
+                insert_sql += f"""'{str(attr_value.get_info()['wrappedValue']).replace("'", "''")}',"""
                 continue
                     
             if attr_type == "DERIVED":
