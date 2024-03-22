@@ -347,7 +347,7 @@ if __name__ == '__main__':
             json_comp.prepare_json(record_num, data_type)
             json_comp.prepare_raw(record_num, data_type)
             
-            # 范围查询测试
+            # 范围插叙测试
             for ratio in selectity:
                 range_start = 1
                 range_end = int(record_num * ratio)
