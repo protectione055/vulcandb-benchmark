@@ -3,21 +3,28 @@ import psycopg2
 import ifcopenshell
 import ifcopenshell.util.selector as selector
 import ifcopenshell.util.element
+from ifcopenshell.api import run
+from ifcopenshell import express
 
 from util.common import Timer
 from task3_cost_estimation.task3 import CostEstimator
 import util.common as util
 
-class PGTask3Impl:
-    
+class Postbim:
     def __init__(self, args):
-        self._database_name = []
-        self._user = args["user"]
-        self._password = args["password"]
-        self._host = args["host"]
-        self._port = args["port"]
+        self.__database_name = "postgres"
+        self.__user = args["user"]
+        self.__password = args["password"]
+        self.__host = args["host"]
+        self.__port = args["port"]
         
-    def _get_create_table_sql(self, entity):
+        try:
+            self.__conn = psycopg2.connect(database=self.__database_name, user=self.__user, password=self.__password, host=self.__host, port=self.__port)
+        except Exception as e:
+            print(e)
+            raise Exception("Failed to connect to database.")
+        
+    def __get_create_table_sql(self, entity):
         create_table_sql = f"CREATE TABLE IF NOT EXISTS {entity.is_a()} (id INTEGER PRIMARY KEY, "  # 创建表的SQL语句
         attr_type_map = {
             "INT": "INTEGER",
@@ -50,7 +57,7 @@ class PGTask3Impl:
         
         return create_table_sql
     
-    def _get_insert_sql(self, entity):
+    def __get_insert_sql(self, entity):
         insert_sql = f"INSERT INTO {entity.is_a()} VALUES ({entity.id()},"
         attr_info = entity.get_info()
         
@@ -60,7 +67,7 @@ class PGTask3Impl:
             attr_value = attr_info[entity.attribute_name(i)]
             
             if entity.is_a("ifcpropertysinglevalue") and attr_name == "NominalValue":
-                insert_sql += f"""'{str(attr_value.get_info()['wrappedValue']).replace("'", "''")}',"""
+                insert_sql += f"'{str(attr_value.get_info()['wrappedValue']).replace("'", "''")}',"
                 continue
                     
             if attr_type == "DERIVED":
@@ -92,48 +99,65 @@ class PGTask3Impl:
         
         return insert_sql
 
-    def _connect_to_db(self, user, password, host, port, database_name):
-        try:
-            conn = psycopg2.connect(database="postgres", user=user, password=password, host=host, port=port)
-            conn.autocommit = True
-            cur = conn.cursor()
-            cur.execute(f"CREATE DATABASE {database_name}")
-        except psycopg2.errors.DuplicateDatabase:
-            pass
-        except Exception as e:
-            raise e
-        finally:
-            conn.close()
-            cur.close()
-        conn = psycopg2.connect(database=database_name, user=user, password=password, host=host, port=port)
-        return conn
+    def __createdb_for_model(self, user, password, host, port, model_name):
+            """
+            创建数据库并返回连接对象。
+
+            参数：
+            user (str)：数据库用户名。
+            password (str)：数据库密码。
+            host (str)：数据库主机地址。
+            port (int)：数据库端口号。
+            model_name (str)：要创建的数据库名称。
+
+            返回：
+            conn (psycopg2.extensions.connection)：数据库连接对象。
+            """
+            try:
+                conn = self.__conn
+                conn.autocommit = True
+                cur = conn.cursor()
+                cur.execute(f"CREATE DATABASE {model_name}")
+            except psycopg2.errors.DuplicateDatabase:
+                pass
+            except Exception as e:
+                raise e
+            finally:
+                conn.close()
+                cur.close()
+            conn = psycopg2.connect(database=model_name, user=user, password=password, host=host, port=port)
+            return conn
         
-    @Timer.eclapse
-    def prepare_data(self, workloads):
-        entity_inited = set()  # 记录已经初始化的实体
-        try:
-            for workload in workloads:
+    def load_model(self, model_path, model_name):
+            """
+            加载模型并将其转换为关系表存储在数据库中。
+
+            Args:
+                model_path (str): 模型文件的路径。
+                model_name (str): 数据库模型的名称。
+            """
+            entity_inited = set()  # 记录已经初始化的实体
+            try:
                 # 创建数据库并连接
-                model_name = os.path.basename(workload).split(".")[0]
-                self._database_name.append(model_name)
-                conn = self._connect_to_db(self._user, self._password, self._host, self._port, model_name)
+                conn = self.__createdb_for_model(self.__user, self.__password, self.__host, self.__port, model_name)
                 print(f"Connected to database {model_name}.")
-                print(f"Loading {workload}...")
+                print(f"Loading {model_path}...")
+                
                 # 将模型转换为关系表
-                ifc_file = ifcopenshell.open(workload)
+                ifc_file = ifcopenshell.open(model_path)
                 for entity in ifc_file:
                     entity_type = entity.is_a()
                     cursor = conn.cursor()
                     if(entity_type not in entity_inited):
                         # 创建实体表
                         entity_inited.add(entity_type)
-                        command = self._get_create_table_sql(entity)
+                        command = self.__get_create_table_sql(entity)
                         cursor.execute(command)
                         conn.commit()
-                        print(command)
+                        # print(command)
                     try:
                         # 插入属性记录
-                        command = self._get_insert_sql(entity)
+                        command = self.__get_insert_sql(entity)
                         cursor.execute(command)
                         # print(command)
                     except psycopg2.errors.UniqueViolation:
@@ -142,64 +166,9 @@ class PGTask3Impl:
                         print(f"Error when inserting {entity}.")
                         print(e)
                         conn.rollback()
+                        
                 conn.commit()
                 cursor.close()
                 conn.close()
-        except Exception as e:
-            print(e)
-        pass
-
-    @Timer.eclapse
-    def run(self):
-        cost_result = self._run_workload1()
-        return cost_result
-    
-    def _run_workload1(self):
-        cost_result = CostEstimator()
-        conn = self._connect_to_db(self._user, self._password, self._host, self._port, "workload1")
-        cur = conn.cursor()
-        
-        # 1. 通过一楼所有的地板面积之和计算场地总面积
-        # 从pg_task3_workload1.sql读取SQL语句
-        query1 = open("task3_cost_estimation/pg_task3_workload1_query1.sql", "r").read()
-        cur.execute(query1)
-        total_site_area = util.square_unit_transform(cur.fetchone()[0], "ft^2")
-        cost_result.set_site_area(total_site_area)
-        
-        # 2. 计算地板面积之和
-        query2 = open("task3_cost_estimation/pg_task3_workload1_query2.sql", "r").read()
-        cur.execute(query2)
-        total_slab_area = util.square_unit_transform(cur.fetchone()[0], "ft^2")
-        cost_result.set_slab_area(total_slab_area)
-        
-        # 3. 计算内/外墙总面积
-        query3_all = open("task3_cost_estimation/pg_task3_workload1_query3.sql", "r").read().split("-- ##")
-        cur.execute(query3_all[0])  # 创建获取Pset_value的函数
-        
-        cur.execute(query3_all[1])
-        tuple = cur.fetchone()
-        cost_result.set_interior_wall_area(tuple[0], "ft^2")
-        
-        cur.execute(query3_all[2])
-        tuple = cur.fetchone()
-        cost_result.set_exterior_wall_area(tuple[0], "ft^2")
-        
-        # 4. 计算屋面总面积
-        query4_all = open("task3_cost_estimation/pg_task3_workload1_query4.sql", "r").read()
-        cur.execute(query4_all)  # 创建获取Pset_value的函数
-        tuple = cur.fetchone()
-        cost_result.set_roof_area(tuple[0], "ft^2")
-        
-        return cost_result
-    
-    def cleanup(self):
-        conn = self._connect_to_db(self._user, self._password, self._host, self._port, self._user)
-        conn.autocommit = True
-        for database_name in self._database_name:
-            cursor = conn.cursor()
-            cursor.execute(f"DROP DATABASE {database_name}")
-            conn.commit()
-            cursor.close()
-        print(f"Cleaned up {len(self._database_name)} databases.")
-        conn.close()
-        pass
+            except Exception as e:
+                print(e)

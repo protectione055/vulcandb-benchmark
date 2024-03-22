@@ -1,0 +1,1 @@
+psql  --host=pc-wz9zm6vjpq9lh9x6i.pg.polardb.rds.aliyuncs.com -p 1921 -U dseg_test -W
